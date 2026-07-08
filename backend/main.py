@@ -2,6 +2,7 @@
 FastAPI application exposing portfolio price, return, and risk metric endpoints.
 """
 
+import math
 from typing import List, Optional
 
 import pandas as pd
@@ -24,6 +25,17 @@ DEFAULT_START_DATE = "2023-01-01"
 BENCHMARK_TICKER = "SPY"
 
 
+def sanitize_json_floats(values_by_ticker: dict) -> dict:
+    """Replace NaN/inf values with None so the dict is JSON-serializable."""
+    return {
+        ticker: [
+            None if isinstance(value, float) and (math.isnan(value) or math.isinf(value)) else value
+            for value in values
+        ]
+        for ticker, values in values_by_ticker.items()
+    }
+
+
 def parse_tickers(tickers: str) -> List[str]:
     parsed = [t.strip().upper() for t in tickers.split(",") if t.strip()]
     if not parsed:
@@ -34,6 +46,8 @@ def parse_tickers(tickers: str) -> List[str]:
 def get_prices(tickers: List[str], start: str) -> pd.DataFrame:
     try:
         prices = fetch_price_data(tickers, start=start)
+    except HTTPException:
+        raise
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Failed to fetch price data: {exc}")
 
@@ -54,7 +68,7 @@ def get_portfolio_prices(
     return {
         "tickers": list(prices.columns),
         "dates": [d.strftime("%Y-%m-%d") for d in prices.index],
-        "prices": prices.round(4).to_dict(orient="list"),
+        "prices": sanitize_json_floats(prices.round(4).to_dict(orient="list")),
     }
 
 
@@ -105,6 +119,8 @@ def get_portfolio_metrics(
         metrics = compute_all_metrics(
             ticker_list, start=start or DEFAULT_START_DATE, benchmark=BENCHMARK_TICKER
         )
+    except HTTPException:
+        raise
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Failed to compute metrics: {exc}")
 

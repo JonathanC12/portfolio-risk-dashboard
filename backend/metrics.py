@@ -51,8 +51,19 @@ def compute_all_metrics(tickers, start, end=None, benchmark="SPY", risk_free_rat
     prices = fetch_price_data(tickers, start=start, end=end)
     returns = compute_daily_returns(prices)
 
-    return pd.DataFrame({
+    result = pd.DataFrame({
         "annualized_volatility": compute_annualized_volatility(returns),
         "sharpe_ratio": compute_sharpe_ratio(returns, risk_free_rate=risk_free_rate),
         "beta": compute_beta(returns, benchmark=benchmark),
     })
+
+    # Round first: once NaN/inf become None below, the DataFrame is object
+    # dtype and .round() silently no-ops on non-numeric columns.
+    result = result.round(4)
+
+    # NaN/inf (e.g. from a zero-variance benchmark) aren't valid JSON;
+    # FastAPI raises a ValueError trying to serialize them.
+    result = result.replace([np.inf, -np.inf], np.nan)
+    result = result.astype(object).where(pd.notnull(result), None)
+
+    return result

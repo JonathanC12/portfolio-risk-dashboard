@@ -6,6 +6,14 @@ import PriceChart from "./components/PriceChart";
 import { getPrices, getReturns, getCorrelation, getMetrics } from "./api";
 import "./App.css";
 
+function getErrorMessage(err) {
+  const detail = err.response?.data?.detail;
+  if (typeof detail === "string") {
+    return detail;
+  }
+  return err.message;
+}
+
 function App() {
   const [tickers, setTickers] = useState("AAPL, MSFT, SPY");
   const [startDate, setStartDate] = useState("2023-01-01");
@@ -34,7 +42,7 @@ function App() {
       setCorrelation(correlationData);
       setMetrics(metricsData);
     } catch (err) {
-      setError(err.message);
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
