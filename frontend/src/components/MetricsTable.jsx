@@ -1,5 +1,6 @@
 const HIGH_SHARPE_THRESHOLD = 1;
 const HIGH_BETA_THRESHOLD = 1.2;
+const BENCHMARK_TICKER = "SPY";
 
 function sharpeColor(sharpe) {
   return sharpe >= HIGH_SHARPE_THRESHOLD ? "#1a7f37" : "inherit";
@@ -27,7 +28,12 @@ function MetricsTable({ metrics }) {
           const { annualized_volatility, sharpe_ratio, beta } = metrics[ticker];
           return (
             <tr key={ticker}>
-              <td>{ticker}</td>
+              <td>
+                {ticker}
+                {ticker === BENCHMARK_TICKER && (
+                  <span className="benchmark-label">Benchmark</span>
+                )}
+              </td>
               <td>{annualized_volatility.toFixed(4)}</td>
               <td style={{ color: sharpeColor(sharpe_ratio), fontWeight: 600 }}>
                 {sharpe_ratio.toFixed(4)}
