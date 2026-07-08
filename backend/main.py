@@ -9,8 +9,16 @@ from fastapi import FastAPI, HTTPException, Query
 
 from data import fetch_price_data, compute_daily_returns
 from metrics import compute_correlation_matrix, compute_all_metrics
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Portfolio Risk Dashboard API")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 DEFAULT_START_DATE = "2023-01-01"
 BENCHMARK_TICKER = "SPY"
