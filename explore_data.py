@@ -8,7 +8,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 # ---- 1. Define your sample portfolio ----
-TICKERS = ["AMZN", "MSFT", "MU", "NVDA", "CRWV", "SPY"]
+TICKERS = ["VOO", "QQQ", "RVI", "NVDA", "CRWV", "SPY"]
 
 # SPY is included as a market benchmark 
 
