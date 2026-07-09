@@ -81,4 +81,5 @@ Then open [http://localhost:5173](http://localhost:5173)
 ## Author
 
 **Jonathan Corll**
-[LinkedIn](https://www.linkedin.com/in/jonathancorll/) · [GitHub](https://github.com/JonathanC12)
+[LinkedIn](https://www.linkedin.com/in/jonathan-corll-19a0412a5/
+) · [GitHub](https://github.com/JonathanC12)
