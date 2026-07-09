@@ -44,6 +44,12 @@ function PriceChart({ prices }) {
       <p className="chart-description">
         Hover over the lines to see exact indexed values.
       </p>
+      <div className="chart-reference-box">
+        <strong>Reading this chart:</strong> All stocks start at 100. A value
+        of 150 means +50% return from your start date. A value of 80 means
+        -20%. Compare lines to see which holdings outperformed the market
+        (SPY).
+      </div>
     </div>
   );
 }

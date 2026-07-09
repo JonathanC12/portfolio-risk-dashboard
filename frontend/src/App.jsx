@@ -54,6 +54,27 @@ function App() {
     <div className="app">
       <h1>Portfolio Risk Dashboard</h1>
 
+      <div className="app-intro">
+        <p>
+          Analyze the risk and performance of any stock portfolio by entering
+          a set of tickers and a start date.
+        </p>
+        <ul>
+          <li>
+            Compare normalized price performance across holdings and against
+            the S&amp;P 500 benchmark
+          </li>
+          <li>
+            Measure diversification through a correlation matrix — lower
+            correlation between holdings means better risk-adjusted returns
+          </li>
+          <li>
+            Evaluate each holding's risk profile through annualized
+            volatility, Sharpe ratio, and market beta
+          </li>
+        </ul>
+      </div>
+
       <TickerInput
         tickers={tickers}
         startDate={startDate}

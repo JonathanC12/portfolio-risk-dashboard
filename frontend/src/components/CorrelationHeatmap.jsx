@@ -39,6 +39,25 @@ function CorrelationHeatmap({ correlation }) {
         to 0 indicate more independent movement. Lower correlation between
         holdings means better diversification.
       </p>
+      <div className="correlation-guide">
+        <div className="correlation-guide-item">
+          <span className="correlation-swatch" style={{ background: "#08306b" }} />
+          0.8 to 1.0: Very high correlation — minimal diversification benefit
+        </div>
+        <div className="correlation-guide-item">
+          <span className="correlation-swatch" style={{ background: "#6baed6" }} />
+          0.5 to 0.8: Moderate correlation — some diversification benefit
+        </div>
+        <div className="correlation-guide-item">
+          <span className="correlation-swatch" style={{ background: "#c6dbef" }} />
+          0.0 to 0.5: Low correlation — good diversification benefit
+        </div>
+        <div className="correlation-guide-item">
+          <span className="correlation-swatch" style={{ background: "#c92a2a" }} />
+          Below 0.0: Negative correlation — excellent diversification, moves
+          opposite to each other
+        </div>
+      </div>
     </div>
   );
 }
