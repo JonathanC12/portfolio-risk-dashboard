@@ -37,3 +37,16 @@ export async function getMetrics(tickers, start) {
   });
   return response.data;
 }
+
+export async function getMonteCarlo(tickers, weights, start, horizon, simulations) {
+  const params = buildParams(tickers, start);
+  params.weights = weights;
+  if (horizon) {
+    params.horizon = horizon;
+  }
+  if (simulations) {
+    params.simulations = simulations;
+  }
+  const response = await axios.get(`${BASE_URL}/portfolio/montecarlo`, { params });
+  return response.data;
+}

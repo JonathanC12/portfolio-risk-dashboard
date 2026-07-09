@@ -10,6 +10,7 @@ from fastapi import FastAPI, HTTPException, Query
 
 from data import fetch_price_data, compute_daily_returns
 from metrics import compute_correlation_matrix, compute_all_metrics
+from simulation import run_monte_carlo
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Portfolio Risk Dashboard API")
@@ -23,6 +24,8 @@ app.add_middleware(
 
 DEFAULT_START_DATE = "2023-01-01"
 BENCHMARK_TICKER = "SPY"
+DEFAULT_HORIZON = 252
+DEFAULT_SIMULATIONS = 1000
 
 
 def sanitize_json_floats(values_by_ticker: dict) -> dict:
@@ -41,6 +44,28 @@ def parse_tickers(tickers: str) -> List[str]:
     if not parsed:
         raise HTTPException(status_code=400, detail="At least one ticker must be provided")
     return parsed
+
+
+def parse_weights(weights: str, num_tickers: int) -> List[float]:
+    parsed = [w.strip() for w in weights.split(",") if w.strip()]
+    try:
+        parsed_floats = [float(w) for w in parsed]
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Weights must be numeric values")
+
+    if len(parsed_floats) != num_tickers:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Number of weights ({len(parsed_floats)}) must match number "
+                f"of tickers ({num_tickers})"
+            ),
+        )
+
+    if not math.isclose(sum(parsed_floats), 1.0, abs_tol=1e-3):
+        raise HTTPException(status_code=400, detail="Weights must sum to 1")
+
+    return parsed_floats
 
 
 def get_prices(tickers: List[str], start: str) -> pd.DataFrame:
@@ -125,3 +150,30 @@ def get_portfolio_metrics(
         raise HTTPException(status_code=502, detail=f"Failed to compute metrics: {exc}")
 
     return metrics.round(4).to_dict(orient="index")
+
+
+@app.get("/portfolio/montecarlo")
+def get_portfolio_montecarlo(
+    tickers: str = Query(..., description="Comma-separated tickers, e.g. AMZN,MSFT,SPY"),
+    weights: str = Query(..., description="Comma-separated weights matching tickers, must sum to 1"),
+    start: Optional[str] = Query(None, description="Start date in YYYY-MM-DD format"),
+    horizon: int = Query(DEFAULT_HORIZON, description="Number of trading days to simulate forward"),
+    simulations: int = Query(DEFAULT_SIMULATIONS, description="Number of simulation paths to run"),
+):
+    ticker_list = parse_tickers(tickers)
+    weight_list = parse_weights(weights, len(ticker_list))
+
+    try:
+        result = run_monte_carlo(
+            ticker_list,
+            weight_list,
+            start=start or DEFAULT_START_DATE,
+            horizon=horizon,
+            simulations=simulations,
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Failed to run Monte Carlo simulation: {exc}")
+
+    return result

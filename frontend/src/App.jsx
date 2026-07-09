@@ -3,7 +3,8 @@ import TickerInput from "./components/TickerInput";
 import MetricsTable from "./components/MetricsTable";
 import CorrelationHeatmap from "./components/CorrelationHeatmap";
 import PriceChart from "./components/PriceChart";
-import { getPrices, getReturns, getCorrelation, getMetrics } from "./api";
+import MonteCarloChart from "./components/MonteCarloChart";
+import { getPrices, getReturns, getCorrelation, getMetrics, getMonteCarlo } from "./api";
 import "./App.css";
 
 function getErrorMessage(err) {
@@ -14,33 +15,56 @@ function getErrorMessage(err) {
   return err.message;
 }
 
+function buildEqualWeights(tickers) {
+  const tickerCount = tickers
+    .split(",")
+    .map((ticker) => ticker.trim())
+    .filter(Boolean).length;
+
+  if (tickerCount === 0) {
+    return "";
+  }
+
+  return Array(tickerCount).fill(1 / tickerCount).join(",");
+}
+
 function App() {
   const [tickers, setTickers] = useState("AAPL, MSFT, SPY");
   const [startDate, setStartDate] = useState("2023-01-01");
+  const [weights, setWeights] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [prices, setPrices] = useState(null);
   const [returns, setReturns] = useState(null);
   const [correlation, setCorrelation] = useState(null);
   const [metrics, setMetrics] = useState(null);
+  const [monteCarlo, setMonteCarlo] = useState(null);
 
-  async function handleSubmit(newTickers, newStartDate) {
+  async function handleSubmit(newTickers, newStartDate, newWeights) {
     setTickers(newTickers);
     setStartDate(newStartDate);
+    setWeights(newWeights);
     setLoading(true);
     setError(null);
 
+    const resolvedWeights = newWeights.trim()
+      ? newWeights
+      : buildEqualWeights(newTickers);
+
     try {
-      const [pricesData, returnsData, correlationData, metricsData] = await Promise.all([
-        getPrices(newTickers, newStartDate),
-        getReturns(newTickers, newStartDate),
-        getCorrelation(newTickers, newStartDate),
-        getMetrics(newTickers, newStartDate),
-      ]);
+      const [pricesData, returnsData, correlationData, metricsData, monteCarloData] =
+        await Promise.all([
+          getPrices(newTickers, newStartDate),
+          getReturns(newTickers, newStartDate),
+          getCorrelation(newTickers, newStartDate),
+          getMetrics(newTickers, newStartDate),
+          getMonteCarlo(newTickers, resolvedWeights, newStartDate),
+        ]);
       setPrices(pricesData);
       setReturns(returnsData);
       setCorrelation(correlationData);
       setMetrics(metricsData);
+      setMonteCarlo(monteCarloData);
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {
@@ -78,6 +102,7 @@ function App() {
       <TickerInput
         tickers={tickers}
         startDate={startDate}
+        weights={weights}
         loading={loading}
         onSubmit={handleSubmit}
       />
@@ -89,6 +114,7 @@ function App() {
           <PriceChart prices={prices} />
           <CorrelationHeatmap correlation={correlation} />
           <MetricsTable metrics={metrics} />
+          {monteCarlo && <MonteCarloChart monteCarlo={monteCarlo} />}
         </div>
       )}
     </div>
