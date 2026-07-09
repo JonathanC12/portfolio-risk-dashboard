@@ -11,6 +11,7 @@ from fastapi import FastAPI, HTTPException, Query
 from data import fetch_price_data, compute_daily_returns
 from metrics import compute_correlation_matrix, compute_all_metrics
 from simulation import run_monte_carlo
+from optimization import run_efficient_frontier, compute_portfolio_performance
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Portfolio Risk Dashboard API")
@@ -26,6 +27,8 @@ DEFAULT_START_DATE = "2023-01-01"
 BENCHMARK_TICKER = "SPY"
 DEFAULT_HORIZON = 252
 DEFAULT_SIMULATIONS = 1000
+DEFAULT_FRONTIER_SIMULATIONS = 5000
+DEFAULT_RISK_FREE_RATE = 0.04
 
 
 def sanitize_json_floats(values_by_ticker: dict) -> dict:
@@ -175,5 +178,36 @@ def get_portfolio_montecarlo(
         raise
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Failed to run Monte Carlo simulation: {exc}")
+
+    return result
+
+
+@app.get("/portfolio/frontier")
+def get_portfolio_frontier(
+    tickers: str = Query(..., description="Comma-separated tickers, e.g. AMZN,MSFT,SPY"),
+    start: Optional[str] = Query(None, description="Start date in YYYY-MM-DD format"),
+    simulations: int = Query(DEFAULT_FRONTIER_SIMULATIONS, description="Number of random portfolios to simulate"),
+    risk_free_rate: float = Query(DEFAULT_RISK_FREE_RATE, description="Annual risk-free rate used for Sharpe ratio"),
+    weights: Optional[str] = Query(None, description="Comma-separated weights matching tickers, must sum to 1"),
+):
+    ticker_list = parse_tickers(tickers)
+    weight_list = parse_weights(weights, len(ticker_list)) if weights else None
+
+    try:
+        result = run_efficient_frontier(
+            ticker_list,
+            start=start or DEFAULT_START_DATE,
+            simulations=simulations,
+            risk_free_rate=risk_free_rate,
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Failed to compute efficient frontier: {exc}")
+
+    if weight_list is not None:
+        result["current_portfolio"] = compute_portfolio_performance(
+            ticker_list, weight_list, start or DEFAULT_START_DATE, risk_free_rate
+        )
 
     return result

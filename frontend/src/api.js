@@ -50,3 +50,18 @@ export async function getMonteCarlo(tickers, weights, start, horizon, simulation
   const response = await axios.get(`${BASE_URL}/portfolio/montecarlo`, { params });
   return response.data;
 }
+
+export async function getEfficientFrontier(tickers, start, weights, simulations, riskFreeRate) {
+  const params = buildParams(tickers, start);
+  if (weights) {
+    params.weights = weights;
+  }
+  if (simulations) {
+    params.simulations = simulations;
+  }
+  if (riskFreeRate !== undefined && riskFreeRate !== null) {
+    params.risk_free_rate = riskFreeRate;
+  }
+  const response = await axios.get(`${BASE_URL}/portfolio/frontier`, { params });
+  return response.data;
+}
