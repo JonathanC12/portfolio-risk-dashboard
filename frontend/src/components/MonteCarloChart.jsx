@@ -117,6 +117,11 @@ function MonteCarloChart({ monteCarlo }) {
         a 90% probability the portfolio ends between the red and green lines
         at the end of the horizon.
       </div>
+      <p className="chart-note">
+        Note: Simulations assume returns follow a normal distribution
+        calibrated to historical data. This may underestimate tail risk
+        during periods of market stress or structural change.
+      </p>
     </div>
   );
 }

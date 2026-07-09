@@ -116,6 +116,15 @@ function App() {
         </ul>
       </div>
 
+      <div className="disclaimer-box">
+        All analysis is based on historical data. Past performance does not
+        guarantee future results. The Efficient Frontier and metrics reflect
+        your selected date range only and may not represent typical market
+        conditions. Monte Carlo simulations model a range of possible future
+        outcomes based on historical return distributions, they are not
+        predictions. Nothing on this dashboard constitutes investment advice.
+      </div>
+
       <TickerInput
         tickers={tickers}
         startDate={startDate}

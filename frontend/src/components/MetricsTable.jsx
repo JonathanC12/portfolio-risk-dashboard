@@ -36,38 +36,45 @@ function MetricsTable({ metrics }) {
   const tickers = Object.keys(metrics);
 
   return (
-    <table className="metrics-table">
-      <thead>
-        <tr>
-          <th>Ticker</th>
-          <MetricHeader label="Volatility" />
-          <MetricHeader label="Sharpe Ratio" />
-          <MetricHeader label="Beta" />
-        </tr>
-      </thead>
-      <tbody>
-        {tickers.map((ticker) => {
-          const { annualized_volatility, sharpe_ratio, beta } = metrics[ticker];
-          return (
-            <tr key={ticker}>
-              <td>
-                {ticker}
-                {ticker === BENCHMARK_TICKER && (
-                  <span className="benchmark-label">Benchmark</span>
-                )}
-              </td>
-              <td>{annualized_volatility.toFixed(4)}</td>
-              <td style={{ color: sharpeColor(sharpe_ratio), fontWeight: 600 }}>
-                {sharpe_ratio.toFixed(4)}
-              </td>
-              <td style={{ color: betaColor(beta), fontWeight: 600 }}>
-                {beta.toFixed(4)}
-              </td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+    <div className="metrics-table-container">
+      <table className="metrics-table">
+        <thead>
+          <tr>
+            <th>Ticker</th>
+            <MetricHeader label="Volatility" />
+            <MetricHeader label="Sharpe Ratio" />
+            <MetricHeader label="Beta" />
+          </tr>
+        </thead>
+        <tbody>
+          {tickers.map((ticker) => {
+            const { annualized_volatility, sharpe_ratio, beta } = metrics[ticker];
+            return (
+              <tr key={ticker}>
+                <td>
+                  {ticker}
+                  {ticker === BENCHMARK_TICKER && (
+                    <span className="benchmark-label">Benchmark</span>
+                  )}
+                </td>
+                <td>{annualized_volatility.toFixed(4)}</td>
+                <td style={{ color: sharpeColor(sharpe_ratio), fontWeight: 600 }}>
+                  {sharpe_ratio.toFixed(4)}
+                </td>
+                <td style={{ color: betaColor(beta), fontWeight: 600 }}>
+                  {beta.toFixed(4)}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <p className="chart-note">
+        Note: Sharpe ratios are calculated using a 0% risk-free rate.
+        Comparing against a realistic risk-free rate of 4-5% would produce
+        lower Sharpe values across all holdings.
+      </p>
+    </div>
   );
 }
 

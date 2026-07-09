@@ -112,6 +112,12 @@ function EfficientFrontierChart({ frontier }) {
         Use this to see whether reallocating toward the star could improve
         your risk-adjusted returns relative to your current holdings.
       </p>
+      <p className="chart-note">
+        Note: Optimal weights reflect historical performance over your
+        selected period only. Short date ranges or unusual market conditions
+        may produce concentrated or unintuitive allocations. Do not use these
+        weights as direct investment guidance.
+      </p>
     </div>
   );
 }
