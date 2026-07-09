@@ -77,8 +77,8 @@ function MonteCarloChart({ monteCarlo }) {
         layout={{
           autosize: true,
           margin: { l: 60, r: 40, t: 20, b: 60 },
-          xaxis: { title: "Trading Days" },
-          yaxis: { title: "Indexed Value" },
+          xaxis: { title: { text: "Trading Days" } },
+          yaxis: { title: { text: "Indexed Value" } },
           hovermode: "closest",
           showlegend: true,
         }}

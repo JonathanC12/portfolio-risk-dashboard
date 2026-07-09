@@ -25,31 +25,55 @@
 }
 
 .ticker-input {
-  display: flex;
-  align-items: flex-end;
-  gap: 1rem;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(140px, 1fr)) auto;
+  grid-template-rows: auto auto auto;
+  column-gap: 1rem;
+  row-gap: 0.25rem;
   margin-bottom: 2rem;
 }
 
-.ticker-input label {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+.ticker-input-field {
+  display: contents;
+}
+
+.ticker-input-label-text {
+  grid-row: 1;
   font-size: 0.875rem;
   text-align: left;
 }
 
+.ticker-input-field-tickers .ticker-input-label-text,
+.ticker-input-field-tickers input {
+  grid-column: 1;
+}
+
+.ticker-input-field-allocation .ticker-input-label-text,
+.ticker-input-field-allocation input,
+.ticker-input-field-allocation .input-helper-text {
+  grid-column: 2;
+}
+
+.ticker-input-field-startdate .ticker-input-label-text,
+.ticker-input-field-startdate input {
+  grid-column: 3;
+}
+
 .ticker-input input {
+  grid-row: 2;
   padding: 0.5rem;
   font-size: 1rem;
 }
 
-.ticker-input button {
+.ticker-input > button {
+  grid-column: 4;
+  grid-row: 2;
+  align-self: center;
   padding: 0.5rem 1.5rem;
 }
 
 .input-helper-text {
+  grid-row: 3;
   font-size: 0.7rem;
   font-weight: 400;
   color: #888;

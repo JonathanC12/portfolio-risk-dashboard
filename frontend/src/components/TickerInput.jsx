@@ -12,8 +12,8 @@ function TickerInput({ tickers, startDate, weights, loading, onSubmit }) {
 
   return (
     <form className="ticker-input" onSubmit={handleSubmit}>
-      <label>
-        Tickers
+      <label className="ticker-input-field ticker-input-field-tickers">
+        <span className="ticker-input-label-text">Tickers</span>
         <input
           type="text"
           placeholder="AAPL, MSFT, SPY"
@@ -21,8 +21,8 @@ function TickerInput({ tickers, startDate, weights, loading, onSubmit }) {
           onChange={(event) => setTickersInput(event.target.value)}
         />
       </label>
-      <label>
-        Allocation
+      <label className="ticker-input-field ticker-input-field-allocation">
+        <span className="ticker-input-label-text">Portfolio Allocation</span>
         <input
           type="text"
           placeholder="0.4, 0.3, 0.3"
@@ -34,8 +34,8 @@ function TickerInput({ tickers, startDate, weights, loading, onSubmit }) {
           0.4, 0.3, 0.3). Leave blank for equal allocation.
         </span>
       </label>
-      <label>
-        Start Date
+      <label className="ticker-input-field ticker-input-field-startdate">
+        <span className="ticker-input-label-text">Start Date</span>
         <input
           type="date"
           value={startDateInput}
