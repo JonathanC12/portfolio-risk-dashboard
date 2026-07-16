@@ -15,6 +15,7 @@ A full-stack quantitative finance web application that allows users to analyze t
 - **Risk Metrics Table** — annualized volatility, Sharpe ratio, and market beta for each holding
 - **Monte Carlo Simulation** — 1,000 simulated portfolio paths over a 1-year horizon with 5th/50th/95th percentile outcomes and Value at Risk
 - **Efficient Frontier** — 5,000 randomly weighted portfolios plotted by risk and return, with optimal max Sharpe and minimum variance portfolios identified via scipy constrained optimization
+- **Fama-French 5-Factor Model** — OLS regression of portfolio returns against the Fama-French 5 factors (Market, SMB, HML, RMW, CMA) using statsmodels, with factor loadings table, horizontal bar chart, annualized alpha, R-squared, and a dynamically generated plain-English interpretation of the portfolio's factor exposures
 
 ## Tech Stack
 
@@ -23,7 +24,7 @@ A full-stack quantitative finance web application that allows users to analyze t
 | Frontend | React, Vite, Plotly.js, Axios |
 | Backend | Python, FastAPI, Uvicorn |
 | Data | yfinance, pandas, numpy |
-| Quantitative Finance | scipy.optimize (Efficient Frontier), Monte Carlo simulation (normal distribution sampling) |
+| Quantitative Finance | scipy.optimize (Efficient Frontier), Monte Carlo simulation (normal distribution sampling), Fama-French 5-Factor OLS Regression (statsmodels) |
 | Deployment | Vercel (frontend), Render (backend) |
 
 ## Project Structure
@@ -77,6 +78,8 @@ Then open [http://localhost:5173](http://localhost:5173)
 **Efficient Frontier:** 5,000 random weight combinations are generated using Dirichlet sampling to ensure even coverage of the allocation space. scipy's SLSQP optimizer is then used to solve for the minimum variance and maximum Sharpe ratio portfolios subject to the constraint that weights sum to 1.
 
 **Limitations:** All outputs are backward-looking and based on historical return distributions, which are not guaranteed to predict future performance. Short date ranges may produce unintuitive or statistically unreliable results. Nothing in this application constitutes investment advice.
+
+**Fama-French Factor Model:** Daily factor returns are downloaded directly from Kenneth French's data library at Dartmouth. Portfolio excess returns are regressed against the five factors using OLS via statsmodels. Factor loadings indicate the portfolio's exposure to each risk premium. R-squared measures how much of the portfolio's return variation is explained by the five factors combined.
 
 ## Author
 
