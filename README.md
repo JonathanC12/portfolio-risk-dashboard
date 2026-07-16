@@ -8,13 +8,15 @@ A full-stack quantitative finance web application that allows users to analyze t
 
 > Note: The backend is hosted on Render's free tier, which spins down after periods of inactivity. The first load may take 30-60 seconds while the backend wakes from idle.
 
+> If you see a "server waking up" message on first load, wait a moment and resubmit — this is expected behavior on the free hosting tier.
+
 ## Features
 
 - **Normalized Price Performance Chart** — compare returns across holdings indexed to 100 at the start date
-- **Portfolio Correlation Matrix** — interactive heatmap showing diversification across holdings
-- **Risk Metrics Table** — annualized volatility, Sharpe ratio, and market beta for each holding
-- **Monte Carlo Simulation** — 1,000 simulated portfolio paths over a 1-year horizon with 5th/50th/95th percentile outcomes and Value at Risk
-- **Efficient Frontier** — 5,000 randomly weighted portfolios plotted by risk and return, with optimal max Sharpe and minimum variance portfolios identified via scipy constrained optimization
+- **Portfolio Correlation Matrix** — interactive heatmap showing diversification across holdings, with dynamic plain-English interpretation of results
+- **Risk Metrics Table** — annualized volatility, Sharpe ratio, and market beta for each holding, with dynamic plain-English interpretation of results
+- **Monte Carlo Simulation** — 1,000 simulated portfolio paths over a 1-year horizon with 5th/50th/95th percentile outcomes and Value at Risk, with dynamic plain-English interpretation of results
+- **Efficient Frontier** — 5,000 randomly weighted portfolios plotted by risk and return, with optimal max Sharpe and minimum variance portfolios identified via scipy constrained optimization, with dynamic plain-English interpretation of results
 - **Fama-French 5-Factor Model** — OLS regression of portfolio returns against the Fama-French 5 factors (Market, SMB, HML, RMW, CMA) using statsmodels, with factor loadings table, horizontal bar chart, annualized alpha, R-squared, and a dynamically generated plain-English interpretation of the portfolio's factor exposures
 
 ## Tech Stack
