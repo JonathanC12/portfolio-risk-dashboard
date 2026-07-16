@@ -1,11 +1,49 @@
 import Plot from "react-plotly.js";
 
+function getOffDiagonalPairs(tickers, correlationMatrix) {
+  const pairs = [];
+  for (let i = 0; i < tickers.length; i++) {
+    for (let j = i + 1; j < tickers.length; j++) {
+      const a = tickers[i];
+      const b = tickers[j];
+      pairs.push({ a, b, value: correlationMatrix[a][b] });
+    }
+  }
+  return pairs;
+}
+
+function diversificationSentence(average) {
+  if (average < 0.3) return "Your portfolio is well diversified overall.";
+  if (average < 0.5) return "Your portfolio has moderate diversification.";
+  if (average < 0.7) return "Your portfolio has limited diversification.";
+  return "Your portfolio is highly concentrated.";
+}
+
+function buildCorrelationSummary(tickers, correlationMatrix) {
+  const pairs = getOffDiagonalPairs(tickers, correlationMatrix);
+  if (pairs.length === 0) {
+    return null;
+  }
+
+  const highest = pairs.reduce((max, p) => (p.value > max.value ? p : max), pairs[0]);
+  const lowest = pairs.reduce((min, p) => (p.value < min.value ? p : min), pairs[0]);
+  const average = pairs.reduce((sum, p) => sum + p.value, 0) / pairs.length;
+
+  return (
+    `${highest.a} and ${highest.b} are the most correlated pair at ${highest.value.toFixed(2)}, ` +
+    `while ${lowest.a} and ${lowest.b} are the least correlated at ${lowest.value.toFixed(2)}. ` +
+    diversificationSentence(average)
+  );
+}
+
 function CorrelationHeatmap({ correlation }) {
   const { tickers, correlation_matrix } = correlation;
 
   const z = tickers.map((rowTicker) =>
     tickers.map((colTicker) => correlation_matrix[rowTicker][colTicker])
   );
+
+  const summary = buildCorrelationSummary(tickers, correlation_matrix);
 
   return (
     <div className="correlation-heatmap">
@@ -39,6 +77,7 @@ function CorrelationHeatmap({ correlation }) {
         to 0 indicate more independent movement. Lower correlation between
         holdings means better diversification.
       </p>
+      {summary && <p className="chart-description">{summary}</p>}
       <div className="correlation-guide">
         <div className="correlation-guide-item">
           <span className="correlation-swatch" style={{ background: "#08306b" }} />

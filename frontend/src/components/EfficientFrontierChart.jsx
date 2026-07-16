@@ -1,10 +1,61 @@
 import Plot from "react-plotly.js";
 
+const ZERO_ALLOCATION_THRESHOLD = 0.0001;
+const MEANINGFUL_ALLOCATION_THRESHOLD = 0.1;
+const CLOSE_TO_OPTIMAL_VOLATILITY_DELTA = 0.02;
+
 function formatWeights(tickers, weights) {
   return tickers.map((ticker, idx) => ({
     ticker,
     weight: weights[idx],
   }));
+}
+
+function formatList(items) {
+  if (items.length === 0) return "";
+  if (items.length === 1) return items[0];
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
+}
+
+function buildFrontierSummary(maxSharpeWeights, maxSharpePortfolio, currentPortfolio) {
+  const zeroAllocationTickers = maxSharpeWeights
+    .filter((w) => w.weight < ZERO_ALLOCATION_THRESHOLD)
+    .map((w) => w.ticker);
+
+  const meaningfulAllocations = maxSharpeWeights
+    .filter((w) => w.weight > MEANINGFUL_ALLOCATION_THRESHOLD)
+    .sort((a, b) => b.weight - a.weight);
+
+  const sentences = [];
+
+  if (zeroAllocationTickers.length > 0) {
+    sentences.push(`${formatList(zeroAllocationTickers)} received no allocation in the Max Sharpe portfolio.`);
+  }
+
+  if (meaningfulAllocations.length > 0) {
+    const meaningfulText = meaningfulAllocations.map(
+      (w) => `${w.ticker} (${(w.weight * 100).toFixed(1)}%)`
+    );
+    sentences.push(`${formatList(meaningfulText)} received the largest allocations.`);
+  }
+
+  if (currentPortfolio) {
+    const volatilityDelta = Math.abs(currentPortfolio.volatility - maxSharpePortfolio.volatility);
+    if (volatilityDelta <= CLOSE_TO_OPTIMAL_VOLATILITY_DELTA) {
+      sentences.push("Your current allocation is close to the optimal risk-adjusted portfolio.");
+    } else {
+      const topTickers =
+        meaningfulAllocations.length > 0
+          ? meaningfulAllocations.map((w) => w.ticker)
+          : maxSharpeWeights.map((w) => w.ticker);
+      sentences.push(
+        `The optimizer suggests reallocating toward ${formatList(topTickers)} to improve your risk-adjusted returns.`
+      );
+    }
+  }
+
+  return sentences.length > 0 ? sentences.join(" ") : null;
 }
 
 function EfficientFrontierChart({ frontier }) {
@@ -67,6 +118,7 @@ function EfficientFrontierChart({ frontier }) {
   }
 
   const maxSharpeWeights = formatWeights(tickers, maxSharpePortfolio.weights);
+  const summary = buildFrontierSummary(maxSharpeWeights, maxSharpePortfolio, currentPortfolio);
 
   return (
     <div className="efficient-frontier-chart">
@@ -112,6 +164,7 @@ function EfficientFrontierChart({ frontier }) {
         Use this to see whether reallocating toward the star could improve
         your risk-adjusted returns relative to your current holdings.
       </p>
+      {summary && <p className="chart-description">{summary}</p>}
       <p className="chart-note">
         Note: Optimal weights reflect historical performance over your
         selected period only. Short date ranges or unusual market conditions

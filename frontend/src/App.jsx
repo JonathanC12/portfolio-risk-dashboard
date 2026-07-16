@@ -145,7 +145,7 @@ function App() {
         <div className="dashboard">
           <PriceChart prices={prices} />
           <CorrelationHeatmap correlation={correlation} />
-          <MetricsTable metrics={metrics} />
+          <MetricsTable metrics={metrics} correlationData={correlation} />
           {monteCarlo && <MonteCarloChart monteCarlo={monteCarlo} />}
           {frontier && <EfficientFrontierChart frontier={frontier} />}
           {factors && <FactorChart factors={factors} />}

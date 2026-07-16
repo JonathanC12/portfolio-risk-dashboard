@@ -24,6 +24,34 @@ function buildAllPathsTrace(paths, xValues) {
   };
 }
 
+function buildMonteCarloSummary(percentile50, finalValueStats, valueAtRisk95) {
+  if (!percentile50.length || !finalValueStats) {
+    return null;
+  }
+
+  const medianEndValue = percentile50[percentile50.length - 1];
+  const gainLossPercent = Math.abs(medianEndValue - 100);
+  const returnSentence =
+    medianEndValue >= 100
+      ? `Based on historical return patterns, the median simulation projects a ${gainLossPercent.toFixed(1)}% gain over the next year.`
+      : `Based on historical return patterns, the median simulation projects a ${gainLossPercent.toFixed(1)}% loss over the next year.`;
+
+  const lossPercent = Math.max(0, valueAtRisk95);
+  const varSentence = `There is a 95% probability that losses will not exceed ${lossPercent.toFixed(1)}% of portfolio value over this horizon.`;
+
+  const rangeWidth = finalValueStats.percentile_95 - finalValueStats.percentile_5;
+  let rangeSentence = "";
+  if (rangeWidth > 100) {
+    rangeSentence =
+      " The wide range of outcomes reflects high portfolio volatility — results may vary significantly from the median.";
+  } else if (rangeWidth < 50) {
+    rangeSentence =
+      " The relatively narrow range suggests more predictable return behavior based on historical data.";
+  }
+
+  return `${returnSentence} ${varSentence}${rangeSentence}`;
+}
+
 function MonteCarloChart({ monteCarlo }) {
   const {
     paths,
@@ -36,6 +64,7 @@ function MonteCarloChart({ monteCarlo }) {
 
   const xValues = percentile50.map((_, idx) => idx);
   const horizonYears = (percentile50.length - 1) / 252;
+  const summary = buildMonteCarloSummary(percentile50, finalValueStats, valueAtRisk95);
 
   const data = [
     buildAllPathsTrace(paths, xValues),
@@ -117,6 +146,7 @@ function MonteCarloChart({ monteCarlo }) {
         a 90% probability the portfolio ends between the red and green lines
         at the end of the horizon.
       </div>
+      {summary && <p className="chart-description">{summary}</p>}
       <p className="chart-note">
         Note: Simulations assume returns follow a normal distribution
         calibrated to historical data. This may underestimate tail risk
