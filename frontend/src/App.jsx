@@ -5,6 +5,7 @@ import CorrelationHeatmap from "./components/CorrelationHeatmap";
 import PriceChart from "./components/PriceChart";
 import MonteCarloChart from "./components/MonteCarloChart";
 import EfficientFrontierChart from "./components/EfficientFrontierChart";
+import FactorChart from "./components/FactorChart";
 import {
   getPrices,
   getReturns,
@@ -12,6 +13,7 @@ import {
   getMetrics,
   getMonteCarlo,
   getEfficientFrontier,
+  getFactorModel,
 } from "./api";
 import "./App.css";
 
@@ -48,6 +50,7 @@ function App() {
   const [metrics, setMetrics] = useState(null);
   const [monteCarlo, setMonteCarlo] = useState(null);
   const [frontier, setFrontier] = useState(null);
+  const [factors, setFactors] = useState(null);
 
   async function handleSubmit(newTickers, newStartDate, newWeights) {
     setTickers(newTickers);
@@ -68,6 +71,7 @@ function App() {
         metricsData,
         monteCarloData,
         frontierData,
+        factorsData,
       ] = await Promise.all([
         getPrices(newTickers, newStartDate),
         getReturns(newTickers, newStartDate),
@@ -75,6 +79,7 @@ function App() {
         getMetrics(newTickers, newStartDate),
         getMonteCarlo(newTickers, resolvedWeights, newStartDate),
         getEfficientFrontier(newTickers, newStartDate, resolvedWeights),
+        getFactorModel(newTickers, resolvedWeights, newStartDate),
       ]);
       setPrices(pricesData);
       setReturns(returnsData);
@@ -82,6 +87,7 @@ function App() {
       setMetrics(metricsData);
       setMonteCarlo(monteCarloData);
       setFrontier(frontierData);
+      setFactors(factorsData);
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {
@@ -142,6 +148,7 @@ function App() {
           <MetricsTable metrics={metrics} />
           {monteCarlo && <MonteCarloChart monteCarlo={monteCarlo} />}
           {frontier && <EfficientFrontierChart frontier={frontier} />}
+          {factors && <FactorChart factors={factors} />}
         </div>
       )}
     </div>

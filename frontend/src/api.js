@@ -65,3 +65,10 @@ export async function getEfficientFrontier(tickers, start, weights, simulations,
   const response = await axios.get(`${BASE_URL}/portfolio/frontier`, { params });
   return response.data;
 }
+
+export async function getFactorModel(tickers, weights, start) {
+  const params = buildParams(tickers, start);
+  params.weights = weights;
+  const response = await axios.get(`${BASE_URL}/portfolio/factors`, { params });
+  return response.data;
+}

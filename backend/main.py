@@ -12,6 +12,7 @@ from data import fetch_price_data, compute_daily_returns
 from metrics import compute_correlation_matrix, compute_all_metrics
 from simulation import run_monte_carlo
 from optimization import run_efficient_frontier, compute_portfolio_performance
+from factors import run_factor_model
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Portfolio Risk Dashboard API")
@@ -209,5 +210,28 @@ def get_portfolio_frontier(
         result["current_portfolio"] = compute_portfolio_performance(
             ticker_list, weight_list, start or DEFAULT_START_DATE, risk_free_rate
         )
+
+    return result
+
+
+@app.get("/portfolio/factors")
+def get_portfolio_factors(
+    tickers: str = Query(..., description="Comma-separated tickers, e.g. AMZN,MSFT,SPY"),
+    weights: str = Query(..., description="Comma-separated weights matching tickers, must sum to 1"),
+    start: Optional[str] = Query(None, description="Start date in YYYY-MM-DD format"),
+):
+    ticker_list = parse_tickers(tickers)
+    weight_list = parse_weights(weights, len(ticker_list))
+
+    try:
+        result = run_factor_model(
+            ticker_list,
+            weight_list,
+            start=start or DEFAULT_START_DATE,
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Failed to run factor model: {exc}")
 
     return result
