@@ -17,12 +17,24 @@ import {
 } from "./api";
 import "./App.css";
 
+const COLD_START_MESSAGE =
+  "The server may still be waking up. Please wait a moment and try again.";
+
+function isColdStartError(err) {
+  const isTimeout = err.code === "ECONNABORTED";
+  const isNetworkError = err.code === "ERR_NETWORK" || err.message === "Network Error";
+  return isTimeout || isNetworkError;
+}
+
 function getErrorMessage(err) {
   const detail = err.response?.data?.detail;
-  if (typeof detail === "string") {
-    return detail;
+  const message = typeof detail === "string" ? detail : err.message;
+
+  if (message?.includes("Insufficient data") || isColdStartError(err)) {
+    return COLD_START_MESSAGE;
   }
-  return err.message;
+
+  return message;
 }
 
 function buildEqualWeights(tickers) {
