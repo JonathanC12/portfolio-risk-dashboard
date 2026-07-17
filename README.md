@@ -8,7 +8,7 @@ A full-stack quantitative finance web application that allows users to analyze t
 
 > Note: The backend is hosted on Render's free tier, which spins down after periods of inactivity. The first load may take 30-60 seconds while the backend wakes from idle.
 
-> If you see a "server waking up" message on first load, wait a moment and resubmit — this is expected behavior on the free hosting tier.
+> If you see a "server waking up" message on first load, wait a moment and resubmit, this is expected behavior on the free hosting tier.
 
 ## Features
 
